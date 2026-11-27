@@ -13,6 +13,7 @@ import {
   ITabGroupRemoveOutput,
   ITabSearchInput,
   ITabSearchOutput,
+  ITargetWindow,
   IUpdateGroupInput,
   IUpdateTab,
 } from './TabsManager.types'
@@ -208,6 +209,49 @@ export class TabsManager {
       return { found: true, tab_id: tab.id || -1, title: currTab?.title || '' }
     } else {
       return { found: false, tab_id: -1, title: '' }
+    }
+  }
+
+  public async getCurrentGroupId(): Promise<number | null> {
+    const [activeTab] = await this.getTabs(this.getCurrentTabQuery)
+    if (!activeTab || activeTab.groupId === chrome.tabGroups.TAB_GROUP_ID_NONE) {
+      return null
+    }
+    return activeTab.groupId
+  }
+
+  public async listTargetWindows(): Promise<ITargetWindow[]> {
+    const [activeTab] = await this.getTabs(this.getCurrentTabQuery)
+    const currentWindowId = activeTab?.windowId
+    const allWindows = await chrome.windows.getAll({ populate: true })
+    return allWindows
+      .filter((w) => w.id !== undefined && w.id !== currentWindowId && w.type === 'normal')
+      .map((w) => {
+        const active = w.tabs?.find((t) => t.active)
+        return { windowId: w.id as number, title: active?.title || `window ${w.id}` }
+      })
+  }
+
+  public async moveCurrentGroupToWindow({
+    groupId,
+    windowId,
+  }: {
+    groupId: number
+    windowId: number
+  }): Promise<void> {
+    await chrome.tabGroups.move(groupId, { index: -1, windowId })
+  }
+
+  public async moveCurrentGroupToNewWindow({ groupId }: { groupId: number }): Promise<void> {
+    const newWindow = await chrome.windows.create({})
+    if (!newWindow || newWindow.id === undefined) throw new Error('failed to create new window')
+    const newWindowId = newWindow.id
+    await chrome.tabGroups.move(groupId, { index: -1, windowId: newWindowId })
+    const stubs = (await chrome.tabs.query({ windowId: newWindowId })).filter(
+      (t) => t.groupId !== groupId && t.id !== undefined,
+    )
+    if (stubs.length > 0) {
+      await chrome.tabs.remove(stubs.map((t) => t.id as number))
     }
   }
 }

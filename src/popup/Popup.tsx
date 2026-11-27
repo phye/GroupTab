@@ -42,6 +42,7 @@ function App() {
           ></div>
         </div>
       </div>
+      <div id="move-picker"></div>
       <footer className="flex justify-between items-center mt-3 mx-1">
         <div className="flex items-center" onClick={() => chrome.runtime.openOptionsPage()}>
           <img className="object-contain mr-2 sm-img" src={Menu1} alt="save button" />

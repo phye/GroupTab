@@ -17,6 +17,7 @@ export enum Cmd {
   SAVE = 'save',
   RESTORE = 'restore',
   COLLAPSE_ALL = 'collapse-all',
+  MOVE = 'move',
 }
 
 export interface ICmd {
@@ -57,6 +58,10 @@ export default class CmdHandler {
     {
       name: Cmd.COLLAPSE_ALL,
       alias: ['collapse-all', 'c'],
+    },
+    {
+      name: Cmd.MOVE,
+      alias: ['move', 'mv'],
     },
   ]
   public tabManager = new TabsManager()
@@ -156,6 +161,29 @@ export default class CmdHandler {
       await this.tabManager.collapseAllTabGroups()
       return { err: '', msg: 'collapsed all tab groups' }
     }
+
+    if (cmd === Cmd.MOVE) {
+      const groupId = await this.tabManager.getCurrentGroupId()
+      if (groupId === null) {
+        return { err: 'current tab is not in a group', msg: '' }
+      }
+      const targets = await this.tabManager.listTargetWindows()
+      const choice = parseInt(args[0], 10)
+      if (isNaN(choice) || choice < 1 || choice > targets.length + 1) {
+        return {
+          err: `invalid window number: ${args[0]}. pick 1..${targets.length + 1}`,
+          msg: '',
+        }
+      }
+      if (choice === targets.length + 1) {
+        await this.tabManager.moveCurrentGroupToNewWindow({ groupId })
+        return { err: '', msg: 'moved group to new window' }
+      }
+      const target = targets[choice - 1]
+      await this.tabManager.moveCurrentGroupToWindow({ groupId, windowId: target.windowId })
+      return { err: '', msg: `moved group to window: ${target.title}` }
+    }
+
     return { err: `No Handler for Cmd ${cmd} found`, msg: '' }
   }
 }

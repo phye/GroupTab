@@ -34,6 +34,7 @@ Once you have installed the GroupTabs extension, you can start using its feature
 - `save` or `sv`: Save all open tabs to a new tab group with the specified `<group-name>`.
 - `restore` or `rs`: Restore the previously saved tab group with the given `<group-name>`.
 - `collapse-all` or `c`: Collapse all tab groups.
+- `move` or `mv`: Move the current tab's group to another window. Typing `move` prompts a numbered list of your other windows (shown by the title of their active tab) plus a final "New window" entry. Type the number and press space/enter to confirm.
 
 Please note that all commands require at least one argument except for the `remove` and `collapse-all` commands.
 

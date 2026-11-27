@@ -74,3 +74,12 @@ export interface IRestoreTabGroupInput {
   tabGroupName: string
   serializedTabGroup: ISerializedTabGroup[]
 }
+
+export interface ITargetWindow {
+  windowId: number
+  title: string
+}
+
+export interface IMoveCurrentGroupToWindowInput {
+  windowId: number
+}
