@@ -4,8 +4,9 @@ export default defineManifest({
   name: 'GroupTab',
   description:
     'Group tab is a keyboard driven tab manager to allow you to manage multi page workflows with ease.',
-  version: '0.0.0.1',
+  version: '1.0.0',
   manifest_version: 3,
+  minimum_chrome_version: '116',
   icons: {
     '16': 'img/icon_black.png',
     '32': 'img/icon_black.png',
@@ -27,18 +28,14 @@ export default defineManifest({
       js: ['src/content/index.ts'],
     },
   ],
-  web_accessible_resources: [
-    {
-      resources: [
-        'img/icon_black.png',
-        'img/icon_green.png',
-        'img/logo-16.png',
-        'img/logo-34.png',
-        'img/logo-48.png',
-        'img/logo-128.png',
-      ],
-      matches: [],
+  commands: {
+    _execute_action: {
+      suggested_key: {
+        default: 'Ctrl+Shift+G',
+        mac: 'Command+Shift+G',
+      },
+      description: 'Open the GroupTabs popup',
     },
-  ],
+  },
   permissions: ['tabGroups', 'tabs', 'storage', 'unlimitedStorage'],
 })

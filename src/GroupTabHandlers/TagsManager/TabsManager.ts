@@ -52,8 +52,8 @@ export class TabsManager {
     })
   }
 
-  public getTabIds(tabs: chrome.tabs.Tab[]): number[] {
-    return tabs.map((tab) => tab.id || -1)
+  public getTabIds(tabs: chrome.tabs.Tab[]): [number, ...number[]] {
+    return tabs.map((tab) => tab.id || -1) as [number, ...number[]]
   }
 
   public async newGroup(tabs: chrome.tabs.Tab[]): Promise<number> {
@@ -81,7 +81,7 @@ export class TabsManager {
   }
 
   public async newEmptyTabGroup() {
-    return chrome.tabs.group({ tabIds: [] })
+    return chrome.tabs.group({ tabIds: [] as unknown as [number, ...number[]] })
   }
 
   public async moveTabsToGroup({ groupId, tabs }: IMoveTabToGroupInput): Promise<number> {
@@ -103,7 +103,7 @@ export class TabsManager {
   }: IUpdateGroupInput): Promise<chrome.tabGroups.TabGroup> {
     return new Promise((resolve) => {
       chrome.tabGroups.update(groupId, { title: tabGroupName, collapsed }, (group) =>
-        resolve(group),
+        resolve(group!),
       )
     })
   }
@@ -136,7 +136,7 @@ export class TabsManager {
     collapsed,
   }: ITabGroupCollapse): Promise<chrome.tabGroups.TabGroup> {
     return new Promise((resolve) => {
-      chrome.tabGroups.update(groupId, { collapsed: !collapsed }, (group) => resolve(group))
+      chrome.tabGroups.update(groupId, { collapsed: !collapsed }, (group) => resolve(group!))
     })
   }
   public async toggleGroupCollapse({

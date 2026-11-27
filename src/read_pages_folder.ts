@@ -1,7 +1,8 @@
-import globSync from 'glob';
+import { globSync } from 'glob'
+import path from 'node:path'
 
-const pages = await globSync('pages/*.html')
+const pages = globSync('pages/*.html')
 
-const arrayKeyValuePairs = pages.map(file => [file.split('\\').slice(-1).toString().split('.html').join(''), file])
+const entries = pages.map((file) => [path.basename(file, '.html'), file])
 
-export const config = Object.fromEntries(arrayKeyValuePairs)
+export const config = Object.fromEntries(entries)
